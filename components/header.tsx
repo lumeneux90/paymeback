@@ -3,14 +3,11 @@
 import { SunIcon, MoonIcon, PersonIcon, ExitIcon } from "@radix-ui/react-icons";
 import { useState, useEffect } from "react";
 import { logout } from "@/lib/auth";
-import { useSession } from "./session-provider";
 import { Theme } from "@/lib/enums";
 import { useRouter } from "next/navigation";
 
 export default function Header() {
   const [theme, setTheme] = useState<Theme>(Theme.LIGHT);
-
-  const session = useSession();
 
   const router = useRouter();
 

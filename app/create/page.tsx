@@ -33,14 +33,14 @@ export default function CreateDebtPage() {
       const data = await getUsers();
 
       // исключаем самого себя
-      setUsers(data.filter((u) => u.id !== session.user.id));
+      setUsers(data.filter((u) => u.id !== session?.user.id));
     }
 
     load();
   }, [router, session]);
 
   const createDebt = async () => {
-    if (!friendId || !amount) return;
+    if (!friendId || !amount || !session) return;
 
     const { error } = await supabase.from("debts").insert([
       {

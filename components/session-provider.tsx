@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { getSession } from "@/lib/auth";
 import { Session } from "@/lib/types";
 
@@ -10,7 +10,11 @@ export function useSession() {
   return useContext(SessionContext);
 }
 
-export function SessionProvider({ children }) {
+interface SessionProviderProps {
+  children: React.ReactNode;
+}
+
+export function SessionProvider({ children }: SessionProviderProps) {
   const [session, setSession] = useState<Session>(null);
 
   useEffect(() => {

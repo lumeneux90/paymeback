@@ -22,8 +22,10 @@ export default function MyDebtPage() {
       return;
     }
 
+    const s = session;
+
     async function load() {
-      const data = await getDebtsFromUser(session.user.id);
+      const data = await getDebtsFromUser(s.user.id);
       setDebts(data);
     }
 

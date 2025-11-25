@@ -21,8 +21,10 @@ export default function FriendsDebtPage() {
       return;
     }
 
+    const s = session;
+
     async function load() {
-      const data = await getDebtsToUser(session.user.id);
+      const data = await getDebtsToUser(s.user.id);
       setDebts(data);
     }
 
