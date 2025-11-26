@@ -1,7 +1,6 @@
 import "./globals.css";
 import Header from "@/components/header";
 import FooterNav from "@/components/footer-nav";
-import { SessionProvider } from "@/components/session-provider";
 
 export const metadata = {
   title: "PayMeBack",
@@ -16,13 +15,11 @@ export default function RootLayout({
   return (
     <html lang="ru" data-theme="light">
       <body className="min-h-screen flex flex-col">
-        <SessionProvider>
-          <Header />
+        <Header />
 
-          <main className="flex-1 p-4 pb-20">{children}</main>
+        <main className="flex-1 p-4 pb-20">{children}</main>
 
-          <FooterNav />
-        </SessionProvider>
+        <FooterNav />
       </body>
     </html>
   );

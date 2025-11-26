@@ -1,47 +1,146 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { loginByName } from "@/lib/auth";
+import { useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
-import { useSession } from "@/components/session-provider";
+
+function usernameToEmail(name: string) {
+  const clean = name.toLowerCase().replace(/\s+/g, "_");
+  return `${clean}@pmb.app`;
+}
+
+function generatePin() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
 
 export default function LoginPage() {
-  const [name, setName] = useState("");
-
   const router = useRouter();
 
-  const handleLogin = async () => {
+  const [name, setName] = useState("");
+  const [pin, setPin] = useState("");
+  const [generatedPin, setGeneratedPin] = useState("");
+  const [step, setStep] = useState<"name" | "login-pin" | "register-show-pin">(
+    "name"
+  );
+
+  async function checkUserExists(email: string) {
+    const { data, error } = await supabase.rpc("find_auth_user", { email });
+
+    if (error) {
+      console.error(error);
+      return false;
+    }
+
+    return data === true;
+  }
+
+  async function handleName() {
     if (!name.trim()) return;
 
-    await loginByName(name.trim());
+    const email = usernameToEmail(name.trim());
+    const exists = await checkUserExists(email);
 
-    router.push("/my-debt");
-  };
-
-  const session = useSession();
-
-  // Авторедирект в приложение, если сессия уже есть
-  useEffect(() => {
-    if (session) {
-      router.push("/my-debt");
+    if (exists) {
+      setStep("login-pin");
+      return;
     }
-  }, [router, session]);
 
-  return (
-    <div className="max-w-xs mx-auto mt-20">
-      <h1 className="text-2xl font-bold mb-4">Вход</h1>
+    // Новый пользователь — генерируем PIN
+    const newPin = generatePin();
+    setGeneratedPin(newPin);
+    setStep("register-show-pin");
+  }
 
-      <input
-        type="text"
-        className="input input-bordered w-full mb-4"
-        placeholder="Как тебя зовут?"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
+  async function handleRegister() {
+    const email = usernameToEmail(name.trim());
 
-      <button className="btn btn-primary w-full" onClick={handleLogin}>
-        Войти
-      </button>
-    </div>
-  );
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password: generatedPin,
+    });
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    const authUser = data.user;
+
+    if (!authUser) return;
+
+    await supabase.from("users").insert({
+      id: authUser.id,
+      name: name.trim(),
+    });
+
+    router.replace("/my-debt");
+  }
+
+  async function handleLoginPin() {
+    const email = usernameToEmail(name.trim());
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password: pin,
+    });
+
+    if (error) {
+      alert("Неверный PIN");
+      return;
+    }
+
+    router.replace("/my-debt");
+  }
+
+  // UI
+  if (step === "name") {
+    return (
+      <div className="max-w-xs mx-auto mt-20">
+        <input
+          className="input input-bordered w-full mb-4"
+          placeholder="Имя"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <button className="btn btn-primary w-full" onClick={handleName}>
+          Далее
+        </button>
+      </div>
+    );
+  }
+
+  if (step === "login-pin") {
+    return (
+      <div className="max-w-xs mx-auto mt-20">
+        <p className="mb-2">
+          Введите PIN для <b>{name}</b>
+        </p>
+        <input
+          className="input input-bordered w-full mb-4"
+          placeholder="PIN"
+          value={pin}
+          onChange={(e) => setPin(e.target.value)}
+        />
+        <button className="btn btn-primary w-full" onClick={handleLoginPin}>
+          Войти
+        </button>
+      </div>
+    );
+  }
+
+  if (step === "register-show-pin") {
+    return (
+      <div className="max-w-xs mx-auto mt-20 text-center">
+        <p className="text-lg font-semibold">Ваш PIN:</p>
+        <p className="text-4xl font-bold tracking-widest my-4">
+          {generatedPin}
+        </p>
+        <button className="btn btn-success w-full" onClick={handleRegister}>
+          Создать аккаунт
+        </button>
+      </div>
+    );
+  }
+
+  return null;
 }

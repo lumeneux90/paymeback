@@ -28,8 +28,3 @@ export type Debt = {
     name: string;
   };
 };
-
-export type Session = {
-  user: User;
-  token: string;
-} | null;

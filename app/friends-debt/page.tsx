@@ -4,38 +4,36 @@ import { useEffect, useState } from "react";
 import { getDebtsToUser } from "@/lib/debts";
 import DebtCard from "@/components/debt-card";
 import { Debt } from "@/lib/types";
-import { useSession } from "@/components/session-provider";
 import { useRouter } from "next/navigation";
+import { useAuthGuard } from "@/lib/useAuthGuard";
 
 export default function FriendsDebtPage() {
   const [debts, setDebts] = useState<Debt[]>([]);
 
-  const session = useSession();
+  const { user, loading } = useAuthGuard();
 
   const router = useRouter();
 
   useEffect(() => {
-    if (!session) {
-      router.push("/login");
-
-      return;
-    }
-
-    const s = session;
-
     async function load() {
-      const data = await getDebtsToUser(s.user.id);
+      if (!user) {
+        return;
+      }
+
+      const data = await getDebtsToUser(user.id);
       setDebts(data);
     }
 
     load();
-  }, [router, session]);
+  }, [router, user]);
+
+  if (loading) return <p className="p-4">Загрузка...</p>;
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-bold mb-3">Долг друзей</h1>
+      <h1 className="text-xl font-bold mb-3">Чеки друзей</h1>
 
-      {debts.length === 0 && <p className="opacity-70">Пока нет долгов</p>}
+      {debts.length === 0 && <p className="opacity-70">Пока нет чеков</p>}
 
       {debts.map((d) => (
         <DebtCard key={d.id} debt={d} />

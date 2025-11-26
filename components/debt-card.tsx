@@ -1,32 +1,25 @@
 "use client";
 
-import {
-  EyeClosedIcon,
-  TrashIcon,
-  ExternalLinkIcon,
-} from "@radix-ui/react-icons";
+import { CheckIcon, ExternalLinkIcon } from "@radix-ui/react-icons";
 import { Debt } from "@/lib/types";
 import { supabase } from "@/lib/supabaseClient";
 import { colorLine } from "@/lib/constants";
-import { useSession } from "./session-provider";
 import { useRouter } from "next/navigation";
+import { useAuthGuard } from "@/lib/useAuthGuard";
 
 export default function DebtCard({ debt }: { debt: Debt }) {
   const router = useRouter();
 
-  const hideDebt = async () => {
-    await supabase.from("debts").update({ status: "hidden" }).eq("id", debt.id);
+  const handlePaid = async () => {
+    await supabase
+      .from("debts")
+      .update({ status: "paid", paid_at: new Date().toISOString() })
+      .eq("id", debt.id);
 
-    router.refresh();
+    router.replace(`/my-debt`);
   };
 
-  const deleteDebt = async () => {
-    await supabase.from("debts").delete().eq("id", debt.id);
-
-    router.refresh();
-  };
-
-  const session = useSession();
+  const { user } = useAuthGuard();
 
   return (
     <div className="card bg-base-200 shadow-md relative">
@@ -38,7 +31,7 @@ export default function DebtCard({ debt }: { debt: Debt }) {
         <div className="flex justify-between items-center mb-2">
           <h2 className="font-bold text-lg">{debt.amount} ₽</h2>
           <span className="badge badge-secondary font-semibold">
-            {session?.user.id === debt.from_user
+            {user?.id === debt.from_user
               ? debt.to_user_data?.name
               : debt.from_user_data?.name}
           </span>
@@ -51,15 +44,8 @@ export default function DebtCard({ debt }: { debt: Debt }) {
         </p>
 
         <div className="flex gap-2 mt-3">
-          <button className="btn btn-sm btn-outline" onClick={hideDebt}>
-            <EyeClosedIcon /> Скрыть
-          </button>
-
-          <button
-            className="btn btn-sm btn-error btn-outline"
-            onClick={deleteDebt}
-          >
-            <TrashIcon /> Удалить
+          <button className="btn btn-sm btn-primary" onClick={handlePaid}>
+            <CheckIcon /> Подвердить оплату
           </button>
 
           {debt.sbp_link && (

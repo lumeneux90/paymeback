@@ -2,18 +2,19 @@
 
 import { SunIcon, MoonIcon, PersonIcon, ExitIcon } from "@radix-ui/react-icons";
 import { useState, useEffect } from "react";
-import { logout } from "@/lib/auth";
 import { Theme } from "@/lib/enums";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function Header() {
   const [theme, setTheme] = useState<Theme>(Theme.LIGHT);
 
   const router = useRouter();
 
+  const pathname = usePathname();
+
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
   }, [theme]);
 
   return (
@@ -39,16 +40,18 @@ export default function Header() {
           <PersonIcon className="w-5 h-5" />
         </button>
 
-        <button
-          className="btn btn-sm btn-ghost btn-circle"
-          aria-label="Выход"
-          onClick={() => {
-            logout();
-            router.push("/login");
-          }}
-        >
-          <ExitIcon className="text-error w-5 h-5" />
-        </button>
+        {pathname !== "/login" && (
+          <button
+            className="btn btn-sm btn-ghost btn-circle"
+            aria-label="Выход"
+            onClick={() => {
+              supabase.auth.signOut();
+              router.replace("/login");
+            }}
+          >
+            <ExitIcon className="text-error w-5 h-5" />
+          </button>
+        )}
       </div>
     </div>
   );

@@ -5,44 +5,42 @@ import { getDebtsFromUser } from "@/lib/debts";
 import DebtCard from "@/components/debt-card";
 import Link from "next/link";
 import { Debt } from "@/lib/types";
-import { useSession } from "@/components/session-provider";
 import { useRouter } from "next/navigation";
+import { useAuthGuard } from "@/lib/useAuthGuard";
 
 export default function MyDebtPage() {
   const [debts, setDebts] = useState<Debt[]>([]);
 
-  const session = useSession();
+  const { user, loading } = useAuthGuard();
 
   const router = useRouter();
 
   useEffect(() => {
-    if (!session) {
-      router.push("/login");
-
-      return;
-    }
-
-    const s = session;
-
     async function load() {
-      const data = await getDebtsFromUser(s.user.id);
+      if (!user) {
+        return;
+      }
+
+      const data = await getDebtsFromUser(user.id);
       setDebts(data);
     }
 
     load();
-  }, [router, session]);
+  }, [router, user]);
+
+  if (loading) return <p className="p-4">Загрузка...</p>;
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-between items-center mb-3">
-        <h1 className="text-xl font-bold">Мой долг</h1>
+        <h1 className="text-xl font-bold">Мои чеки</h1>
 
         <Link href="/create" className="btn btn-primary btn-sm">
-          + Создать долг
+          + Создать чек
         </Link>
       </div>
 
-      {debts.length === 0 && <p className="opacity-70">Пока нет долгов</p>}
+      {debts.length === 0 && <p className="opacity-70">Пока нет чеков</p>}
 
       {debts.map((d) => (
         <DebtCard key={d.id} debt={d} />

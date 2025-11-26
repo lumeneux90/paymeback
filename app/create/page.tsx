@@ -5,8 +5,8 @@ import { getUsers } from "@/lib/users";
 import { supabase } from "@/lib/supabaseClient";
 import { DebtStatus, Tags } from "@/lib/enums";
 import { User } from "@/lib/types";
-import { useSession } from "@/components/session-provider";
 import { useRouter } from "next/navigation";
+import { useAuthGuard } from "@/lib/useAuthGuard";
 
 export default function CreateDebtPage() {
   const TAGS = Object.values(Tags);
@@ -18,33 +18,29 @@ export default function CreateDebtPage() {
   const [tag, setTag] = useState<Tags | undefined>();
   const [sbp, setSbp] = useState("");
 
+  const { user } = useAuthGuard();
   const router = useRouter();
 
-  const session = useSession();
-
   useEffect(() => {
-    if (!session) {
-      router.push("/login");
-
-      return;
-    }
-
     async function load() {
+      if (!user) {
+        return;
+      }
       const data = await getUsers();
 
       // исключаем самого себя
-      setUsers(data.filter((u) => u.id !== session?.user.id));
+      setUsers(data.filter((u) => u.id !== user.id));
     }
 
     load();
-  }, [router, session]);
+  }, [router, user]);
 
   const createDebt = async () => {
-    if (!friendId || !amount || !session) return;
+    if (!friendId || !amount || !user) return;
 
     const { error } = await supabase.from("debts").insert([
       {
-        from_user: session.user.id,
+        from_user: user.id,
         to_user: friendId,
         amount: Number(amount),
         description,
@@ -60,16 +56,16 @@ export default function CreateDebtPage() {
       return;
     }
 
-    router.push("/my-debt");
+    router.replace("/my-debt");
   };
 
   return (
     <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-full border p-4">
-      <legend className="fieldset-legend text-lg">Создать долг</legend>
+      <legend className="fieldset-legend text-lg">Создать чек</legend>
 
       {/* Друг */}
 
-      <label className="label">Кому должен?</label>
+      <label className="label">Кому?</label>
       <select
         className="select select-bordered"
         value={friendId}
@@ -132,7 +128,7 @@ export default function CreateDebtPage() {
 
       {/* Создать */}
       <button className="btn btn-primary mt-4" onClick={createDebt}>
-        Создать долг
+        Создать чек
       </button>
     </fieldset>
   );
