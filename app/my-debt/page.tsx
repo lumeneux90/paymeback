@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Debt } from "@/lib/types";
 import { useRouter } from "next/navigation";
 import { useAuthGuard } from "@/lib/useAuthGuard";
+import { PlusIcon } from "@radix-ui/react-icons";
 
 export default function MyDebtPage() {
   const [debts, setDebts] = useState<Debt[]>([]);
@@ -36,7 +37,7 @@ export default function MyDebtPage() {
         <h1 className="text-xl font-bold">Мои чеки</h1>
 
         <Link href="/create" className="btn btn-primary btn-sm">
-          + Создать чек
+          <PlusIcon /> Создать чек
         </Link>
       </div>
 

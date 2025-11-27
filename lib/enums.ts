@@ -10,6 +10,7 @@ export enum Tags {
 export enum DebtStatus {
   PENDING = "pending",
   PAID = "paid",
+  WAITING = "waiting",
 }
 
 export enum Theme {

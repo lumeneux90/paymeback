@@ -5,6 +5,9 @@ import FooterNav from "@/components/footer-nav";
 export const metadata = {
   title: "PayMeBack",
   description: "Справедливое приложение для закрытия долгов",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

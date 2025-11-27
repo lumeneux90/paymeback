@@ -6,8 +6,8 @@ export async function getDebtsFromUser(userId: string): Promise<Debt[]> {
     .from("debts")
     .select(
       `*,
-      from_user_data:users!debts_from_user_fkey(id, name),
-      to_user_data:users!debts_to_user_fkey(id, name)`
+      from_user_data:users!debts_from_user_fkey(id, name, phone),
+      to_user_data:users!debts_to_user_fkey(id, name, phone)`
     )
     .eq("from_user", userId)
     .order("created_at", { ascending: false });
@@ -24,8 +24,8 @@ export async function getDebtsToUser(userId: string): Promise<Debt[]> {
     .from("debts")
     .select(
       `*,
-      from_user_data:users!debts_from_user_fkey(id, name),
-      to_user_data:users!debts_to_user_fkey(id, name)`
+      from_user_data:users!debts_from_user_fkey(id, name, phone),
+      to_user_data:users!debts_to_user_fkey(id, name, phone)`
     )
     .eq("to_user", userId)
     .order("created_at", { ascending: false });

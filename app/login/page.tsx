@@ -18,6 +18,7 @@ export default function LoginPage() {
 
   const [name, setName] = useState("");
   const [pin, setPin] = useState("");
+  const [phone, setPhone] = useState("");
   const [generatedPin, setGeneratedPin] = useState("");
   const [step, setStep] = useState<"name" | "login-pin" | "register-show-pin">(
     "name"
@@ -71,6 +72,7 @@ export default function LoginPage() {
     await supabase.from("users").insert({
       id: authUser.id,
       name: name.trim(),
+      phone: phone.trim(),
     });
 
     router.replace("/my-debt");
@@ -131,11 +133,21 @@ export default function LoginPage() {
   if (step === "register-show-pin") {
     return (
       <div className="max-w-xs mx-auto mt-20 text-center">
-        <p className="text-lg font-semibold">Ваш PIN:</p>
+        <p className="text-lg font-semibold">Ваш PIN-код для входа:</p>
         <p className="text-4xl font-bold tracking-widest my-4">
           {generatedPin}
         </p>
-        <button className="btn btn-success w-full" onClick={handleRegister}>
+        <input
+          className="input input-bordered w-full mb-4"
+          placeholder="Телефон в формате 79091234567"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
+        <button
+          className="btn btn-primary w-full"
+          onClick={handleRegister}
+          disabled={phone.length !== 11}
+        >
           Создать аккаунт
         </button>
       </div>
