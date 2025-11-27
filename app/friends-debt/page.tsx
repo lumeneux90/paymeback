@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { getDebtsToUser } from "@/lib/debts";
 import DebtCard from "@/components/debt-card";
 import { Debt } from "@/lib/types";
-import { useRouter } from "next/navigation";
 import { useAuthGuard } from "@/lib/useAuthGuard";
 
 export default function FriendsDebtPage() {
@@ -12,20 +11,19 @@ export default function FriendsDebtPage() {
 
   const { user, loading } = useAuthGuard();
 
-  const router = useRouter();
-
-  useEffect(() => {
-    async function load() {
-      if (!user) {
-        return;
-      }
-
-      const data = await getDebtsToUser(user.id);
-      setDebts(data);
+  async function load() {
+    if (!user) {
+      return;
     }
 
+    const data = await getDebtsToUser(user.id);
+    setDebts(data);
+  }
+
+  useEffect(() => {
     load();
-  }, [router, user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (loading) return <p className="p-4">Загрузка...</p>;
 
@@ -36,7 +34,7 @@ export default function FriendsDebtPage() {
       {debts.length === 0 && <p className="opacity-70">Пока нет чеков</p>}
 
       {debts.map((d) => (
-        <DebtCard key={d.id} debt={d} />
+        <DebtCard key={d.id} debt={d} refresh={load} />
       ))}
     </div>
   );
