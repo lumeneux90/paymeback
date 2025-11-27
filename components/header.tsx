@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { Theme } from "@/lib/enums";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import Logo from "./logo";
 
 export default function Header() {
   const [theme, setTheme] = useState<Theme>(Theme.LIGHT);
@@ -20,7 +21,7 @@ export default function Header() {
   return (
     <div className="navbar bg-base-200 shadow-sm p-4">
       <div className="flex-1">
-        <h1 className="text-2xl font-semibold">PayMeBack</h1>
+        <Logo />
       </div>
       <div className="flex gap-2 items-center">
         <button

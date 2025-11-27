@@ -14,7 +14,6 @@ export type Debt = {
   amount: number;
   description: string;
   tag: string;
-  sbp_link?: string;
   status: DebtStatus;
   created_at: string;
   paid_at?: string;
@@ -22,9 +21,11 @@ export type Debt = {
   from_user_data?: {
     id: string;
     name: string;
+    phone: string;
   };
   to_user_data?: {
     id: string;
     name: string;
+    phone: string;
   };
 };

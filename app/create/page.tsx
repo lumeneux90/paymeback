@@ -16,7 +16,6 @@ export default function CreateDebtPage() {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [tag, setTag] = useState<Tags | undefined>();
-  const [sbp, setSbp] = useState("");
 
   const { user } = useAuthGuard();
   const router = useRouter();
@@ -45,7 +44,6 @@ export default function CreateDebtPage() {
         amount: Number(amount),
         description,
         tag,
-        sbp_link: sbp || null,
         status: DebtStatus.PENDING,
       },
     ]);
@@ -65,7 +63,7 @@ export default function CreateDebtPage() {
 
       {/* Друг */}
 
-      <label className="label">Кому?</label>
+      <label className="label">Кто?</label>
       <select
         className="select select-bordered"
         value={friendId}
@@ -114,16 +112,6 @@ export default function CreateDebtPage() {
         value={description}
         onChange={(e) => setDescription(e.target.value)}
         placeholder="За что должен?"
-      />
-
-      {/* СБП */}
-      <label className="label">Ссылка СБП (опционально)</label>
-      <input
-        type="text"
-        className="input input-bordered"
-        value={sbp}
-        onChange={(e) => setSbp(e.target.value)}
-        placeholder="https://qr.nspk.ru/..."
       />
 
       {/* Создать */}
