@@ -6,8 +6,15 @@ import { Debt } from "@/lib/types";
 import { useAuthGuard } from "@/lib/useAuthGuard";
 import { DebtStatus } from "@/lib/enums";
 import { colorLine } from "@/lib/constants";
+import { CheckIcon } from "@radix-ui/react-icons";
 
-export default function DebtCard({ debt }: { debt: Debt }) {
+export default function DebtCard({
+  debt,
+  refresh,
+}: {
+  debt: Debt;
+  refresh: () => Promise<void>;
+}) {
   const { user } = useAuthGuard();
 
   if (!user) {
@@ -17,8 +24,8 @@ export default function DebtCard({ debt }: { debt: Debt }) {
   const isCreditor = user.id === debt.from_user;
   const isDebtor = user.id === debt.to_user;
 
-  const paymentUrl = debt?.to_user_data
-    ? `https://qr.nspk.ru/?phone=${debt.to_user_data.phone}&sum=${debt.amount}&comment=Debt%20${debt.id}`
+  const paymentUrl = debt?.from_user_data
+    ? `https://www.sberbank.com/sms/pbpn?requisiteNumber=${debt.from_user_data.phone}`
     : "";
 
   async function markPaid() {
@@ -26,6 +33,8 @@ export default function DebtCard({ debt }: { debt: Debt }) {
       .from("debts")
       .update({ status: DebtStatus.WAITING })
       .eq("id", debt.id);
+
+    await refresh();
   }
 
   async function confirmPaid() {
@@ -33,6 +42,8 @@ export default function DebtCard({ debt }: { debt: Debt }) {
       .from("debts")
       .update({ status: DebtStatus.PAID })
       .eq("id", debt.id);
+
+    await refresh();
   }
 
   return (
@@ -86,7 +97,9 @@ export default function DebtCard({ debt }: { debt: Debt }) {
         )}
         {/* ----- Статус оплачено ----- */}
         {debt.status === DebtStatus.PAID && (
-          <p className="text-success font-semibold mt-3">✔ Долг закрыт</p>
+          <p className="text-success font-semibold mt-3">
+            <CheckIcon /> Чек оплачен
+          </p>
         )}
       </div>
     </div>
