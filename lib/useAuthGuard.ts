@@ -9,7 +9,6 @@ export function useAuthGuard() {
   const router = useRouter();
 
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function init() {
@@ -23,11 +22,10 @@ export function useAuthGuard() {
       }
 
       setUser(user);
-      setLoading(false);
     }
 
     init();
   }, [router]);
 
-  return { user, loading };
+  return { user };
 }

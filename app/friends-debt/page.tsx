@@ -8,8 +8,9 @@ import { useAuthGuard } from "@/lib/useAuthGuard";
 
 export default function FriendsDebtPage() {
   const [debts, setDebts] = useState<Debt[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const { user, loading } = useAuthGuard();
+  const { user } = useAuthGuard();
 
   async function load() {
     if (!user) {
@@ -17,15 +18,22 @@ export default function FriendsDebtPage() {
     }
 
     const data = await getDebtsToUser(user.id);
+
     setDebts(data);
+    setLoading(false);
   }
 
   useEffect(() => {
-    load();
+    if (user) load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user]);
 
-  if (loading) return <p className="p-4">Загрузка...</p>;
+  if (loading)
+    return (
+      <div className="w-full h-[80vh] flex justify-center items-center">
+        <span className="loading loading-infinity loading-xl text-primary"></span>
+      </div>
+    );
 
   return (
     <div className="flex flex-col gap-4">

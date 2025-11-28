@@ -6,7 +6,6 @@ import { Debt } from "@/lib/types";
 import { useAuthGuard } from "@/lib/useAuthGuard";
 import { DebtStatus } from "@/lib/enums";
 import { colorLine } from "@/lib/constants";
-import { CheckIcon } from "@radix-ui/react-icons";
 
 export default function DebtCard({
   debt,
@@ -70,10 +69,16 @@ export default function DebtCard({
         {/* ----- Должник ----- */}
         {isDebtor && debt.status === "pending" && (
           <>
-            <h4 className="font-semibold mb-3 self-center">Оплата через СБП</h4>
-
-            <div className="flex justify-center my-2">
-              <QRCode value={paymentUrl} size={160} />
+            <div className="collapse collapse-arrow bg-base-100 border-base-300 border">
+              <input type="checkbox" />
+              <div className="collapse-title font-semibold">
+                Оплата через QR-код
+              </div>
+              <div className="collapse-content text-sm">
+                <div className="flex justify-center my-2">
+                  <QRCode value={paymentUrl} size={160} />
+                </div>
+              </div>
             </div>
 
             <a
@@ -97,8 +102,8 @@ export default function DebtCard({
         )}
         {/* ----- Статус оплачено ----- */}
         {debt.status === DebtStatus.PAID && (
-          <p className="text-success font-semibold mt-3">
-            <CheckIcon /> Чек оплачен
+          <p className="text-primary font-semibold mt-3 text-lg">
+            <span>Чек оплачен</span>
           </p>
         )}
       </div>

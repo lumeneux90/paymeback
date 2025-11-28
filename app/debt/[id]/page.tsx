@@ -5,12 +5,15 @@ import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { Debt } from "@/lib/types";
 import DebtCard from "@/components/debt-card";
+import { useAuthGuard } from "@/lib/useAuthGuard";
 
 export default function DebtPage() {
   const { id } = useParams();
 
   const [debt, setDebt] = useState<Debt | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const { user } = useAuthGuard();
 
   async function load() {
     const { data, error } = await supabase
@@ -29,16 +32,24 @@ export default function DebtPage() {
 
   // Загружаем долг
   useEffect(() => {
-    load();
+    if (user) load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user]);
 
-  if (loading) return <p className="opacity-70">Загружаем...</p>;
-  if (!debt) return <p className="opacity-70">Долг не найден</p>;
+  if (loading)
+    return (
+      <div className="w-full h-[80vh] flex justify-center items-center">
+        <span className="loading loading-infinity loading-xl text-primary"></span>
+      </div>
+    );
 
   return (
     <div className="card bg-base-200 shadow-md relative max-w-md mx-auto mt-6">
-      <DebtCard debt={debt} refresh={load} />
+      {!debt ? (
+        <p className="opacity-70">Пока нет чеков</p>
+      ) : (
+        <DebtCard debt={debt} refresh={load} />
+      )}
     </div>
   );
 }
