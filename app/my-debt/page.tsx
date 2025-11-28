@@ -10,8 +10,9 @@ import { PlusIcon } from "@radix-ui/react-icons";
 
 export default function MyDebtPage() {
   const [debts, setDebts] = useState<Debt[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const { user, loading } = useAuthGuard();
+  const { user } = useAuthGuard();
 
   async function load() {
     if (!user) {
@@ -19,15 +20,22 @@ export default function MyDebtPage() {
     }
 
     const data = await getDebtsFromUser(user.id);
+
     setDebts(data);
+    setLoading(false);
   }
 
   useEffect(() => {
-    load();
+    if (user) load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user]);
 
-  if (loading) return <p className="p-4">Загрузка...</p>;
+  if (loading)
+    return (
+      <div className="w-full h-[80vh] flex justify-center items-center">
+        <span className="loading loading-infinity loading-xl text-primary"></span>
+      </div>
+    );
 
   return (
     <div className="flex flex-col gap-4">

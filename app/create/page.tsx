@@ -32,7 +32,7 @@ export default function CreateDebtPage() {
     }
 
     load();
-  }, [router, user]);
+  }, [user]);
 
   const createDebt = async () => {
     if (!friendId || !amount || !user) return;
